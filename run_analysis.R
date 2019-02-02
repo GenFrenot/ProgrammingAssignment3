@@ -17,10 +17,17 @@
 # source("run_analysis.R")
 #
 # This scripts uses libraries dplyr and reshape2: remove the comments to install the related packages if not yet available in your environment
-#install.packages("dplyr")
+#for the features of the tidy data course
+#install.packages("dplyr") #uncomment if the paxkage was not yet loaded
 library(dplyr)
-#install.packages("reshape2")
+
+#to melt and dcast the data
+#install.packages("reshape2") #uncomment if the paxkage was not yet loaded
 library(reshape2)
+
+#to generate the codebook
+#install.packages("dataMaid") #uncomment if the paded 
+library(dataMaid)
 
 # Clear the workspace
 rm(list=ls()) 
@@ -73,14 +80,22 @@ colnames(selected_X)<-selected_features[,2]
 # The data frame "subject" has 10299 observations of 1 variable: the subject who performed the activity for each window sample.
 # The data frame "y_labels" has 10299 observations of 2 variable: 
 #                                      V1 is the id and V2 is the description of the activity performed for each window sample.
+# The data frame "selected_X" has 10299 observation of 79 mean and std variables recorded by the phone sensor
+#                                      tBodyAcc-mean()-Y..fBodyBodyGyroJerkMag-meanFreq()
+#
 # Binding the subject, activity and features together as one data frame
 data<-cbind(subject=subject$V1,activity=y_labels$V2,selected_X)
+
+test<-cbind(subject=subject$V1,activity=y_labels$V2)
+write.table(test,file="test.txt", row.name=FALSE)
+
 
 #
 # 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 #
 # To facilicate averaging, we want to have only one measure per record. So we melt our data frame by subject and activity:
-dataMelt<-melt(data,id=c("subject","activity"),measure.vars=selected_features[,2])
+#dataMelt<-melt(data,id=c("subject","activity"),measure.vars=selected_features[,2])
+
 # Calculating the average by subject and activity for each variable
 averages<-dcast(dataMelt,subject + activity ~ variable, mean)
 
@@ -89,7 +104,8 @@ averages<-dcast(dataMelt,subject + activity ~ variable, mean)
 #
 write.table(averages,file="averages.txt", row.name=FALSE)
 
-
+# Automatically generates a code book about the averages data file
+makeCodebook(averages)
 
 
 
